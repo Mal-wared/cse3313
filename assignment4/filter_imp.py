@@ -1,24 +1,16 @@
-import math
 import numpy as np
 import matplotlib.pyplot as plt
+import filter_graphing as fg
+import FIR 
 
+# Return all values from an input file
 def get_values(file_name):
     with open(file_name, 'r') as file:
-        # Read the first line
         line = file.readline().strip()
-
-        # Split the line by commas and convert it to a list
         array = np.array(line.split(',')).astype(np.float64)
-
-        # Print the result
         return array
 
-def sample_signal(fs, freq1, freq2):
-    x = []
-    for i in range(fs):
-        x.append(math.sin(2 * math.pi * freq1 * i / fs) + math.sin(2 * math.pi * freq2 * i / fs))
-    return np.array(x)
-
+# Return the DFT of an input array
 def DFT(input_array):
     N = len(input_array)
     n = np.arange(N)
@@ -27,32 +19,42 @@ def DFT(input_array):
     X = np.dot(W, input_array)
     return np.abs(X)
 
-fs = 1000
-sig = DFT(sample_signal(fs, 53, 370))
+def main():
+    unsampled_x = get_values("input.csv")
+    x = unsampled_x[0:100]
+    x_ind = np.linspace(0, 0.1, len(x))
 
-def graph_signal(signal):
-    signal_shifted = np.fft.fftshift(signal)
+    h = get_values("filter.csv")
+    h_ind = np.linspace(0, len(h), len(h))
 
-    # Plot frequency domain
-    plt.plot(np.linspace(-fs/2, fs/2, len(signal_shifted)), signal_shifted, 'r', label='Frequency Domain')
-    plt.title("Frequency Domain")
-    plt.xlabel("Frequency (Hz)")
-    plt.xlim(-fs/2, fs/2)
-    plt.ylabel("Magnitude")
-    plt.ylim(0, 2000)
-    plt.grid(True)
+    # Plot input signal
+    #fg.graph(x, x_ind, [0, 0.1], [-6, 6], "x[n]")
     
-    # Add vertical lines at the input frequencies
-    plt.axvline(x=53, color='g', linestyle='--', alpha=0.5)
-    plt.axvline(x=370, color='g', linestyle='--', alpha=0.5)
-    plt.axvline(x=-53, color='g', linestyle='--', alpha=0.5)
-    plt.axvline(x=-370, color='g', linestyle='--', alpha=0.5)
+    # Plot filter
+    #fg.graph(h, h_ind, [0, 120], [-0.05, 0.25], "br = h[k]")
+    
+    # Perform convolution
+    # Perform difference equation
+    y = FIR.convolve(x, h, 0, 50)[0:100]
+    y = FIR.difference_equation(x, h)
+    
+    y_ind = np.linspace(0, 150, len(y))
+    
+    # Plot result
+    fg.graph(y, y_ind, [0, 200], [-1, 1], "y[n]")
+    
+    X = DFT(unsampled_x)
+    X_ind = np.linspace(0, 1000, len(X))
+    H = DFT(h)
+    H_ind = np.linspace(0, 1000, len(H))
+    fg.graph(X, X_ind, [0, 1000], [0, 2000], "X[k]")
 
-    # Display w/ tight layout
-    plt.tight_layout()
-    plt.show()
-    # DFT the input numbers
+if __name__ == "__main__":
+    main()
 
-graph_signal(sig)
+
+
+
+
 
 
