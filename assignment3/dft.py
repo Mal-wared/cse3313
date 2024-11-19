@@ -7,8 +7,8 @@ def get_values(file_name):
         line = file.readline().strip()
 
         # Split the line by commas and convert it to a list
-        array = line.split(',')
-        
+        array = np.array(line.split(',')).astype(np.float64)
+
         # Print the result
         return array
 
@@ -18,14 +18,14 @@ def DFT(input_array):
     k = n.reshape((N, 1))
     W = np.exp(-2j * np.pi * n * k / N)
     X = np.dot(W, input_array)
-    return X
+    return np.abs(X)
 # Get input numbers and convert from string to float as well as indices
-input_nums_str = np.array(get_values("input.csv"))
-input_nums = input_nums_str.astype(np.float64)
+input_nums = get_values("input.csv")
 indices = np.linspace(0, len(input_nums), len(input_nums))
 
+
 # DFT the input numbers
-dft_array = np.abs(DFT(input_nums))
+dft_array = DFT(input_nums)
 
 # Getting expected output array
 expected_output_str = np.array(get_values("testout.csv"))
