@@ -17,7 +17,7 @@ def DFT(input_array):
     k = n.reshape((N, 1))
     W = np.exp(-2j * np.pi * n * k / N)
     X = np.dot(W, input_array)
-    return np.abs(X)
+    return X
 
 
 def main():
@@ -38,9 +38,7 @@ def main():
         file.write('\n'.join(map(str, y)))
 
     X = DFT(x)
-    X = np.append(X[int(len(X)/2):len(X)], X[0:int(len(X)/2)])
     H = DFT(h)
-    H = np.append(H[int(len(H)/2):len(H)], H[0:int(len(H)/2)])
 
     XH = [X[i] * H[i] for i in range(len(X))]
 
@@ -51,10 +49,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
