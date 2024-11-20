@@ -19,35 +19,35 @@ def DFT(input_array):
     X = np.dot(W, input_array)
     return np.abs(X)
 
+
 def main():
-    unsampled_x = get_values("input.csv")
-    x = unsampled_x[0:100]
-    x_ind = np.linspace(0, 0.1, len(x))
-
+    x = get_values("input.csv")
+    
     h = get_values("filter.csv")
-    h_ind = np.linspace(0, len(h), len(h))
+    for i in range(900):
+        h = np.append(h, 0)
 
-    # Plot input signal
-    #fg.graph(x, x_ind, [0, 0.1], [-6, 6], "x[n]")
-    
-    # Plot filter
-    #fg.graph(h, h_ind, [0, 120], [-0.05, 0.25], "br = h[k]")
-    
-    # Perform convolution
-    # Perform difference equation
-    y = FIR.convolve(x, h, 0, 50)[0:100]
+    y = FIR.convolve(x, h)
+
+    with open("conv_output.csv", 'w') as file:
+        file.write('\n'.join(map(str, y)))
+
     y = FIR.difference_equation(x, h)
-    
-    y_ind = np.linspace(0, 150, len(y))
-    
-    # Plot result
-    fg.graph(y, y_ind, [0, 200], [-1, 1], "y[n]")
-    
-    X = DFT(unsampled_x)
-    X_ind = np.linspace(0, 1000, len(X))
+
+    with open("diff_eq_output.csv", 'w') as file:
+        file.write('\n'.join(map(str, y)))
+
+    X = DFT(x)
+    X = np.append(X[int(len(X)/2):len(X)], X[0:int(len(X)/2)])
     H = DFT(h)
-    H_ind = np.linspace(0, 1000, len(H))
-    fg.graph(X, X_ind, [0, 1000], [0, 2000], "X[k]")
+    H = np.append(H[int(len(H)/2):len(H)], H[0:int(len(H)/2)])
+
+    XH = [X[i] * H[i] for i in range(len(X))]
+
+    Y = FIR.IDFT(XH)
+
+    with open("dft_output.csv", 'w') as file:
+        file.write('\n'.join(map(str, Y)))
 
 if __name__ == "__main__":
     main()
